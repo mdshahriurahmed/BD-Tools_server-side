@@ -2,7 +2,7 @@ const express = require('express')
 const app = express();
 require('dotenv').config();
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 
@@ -23,6 +23,8 @@ async function run() {
         await client.connect();
         const toolsCollection = client.db('bd-tools').collection('tools');
 
+        // view all tools
+
         app.get('/tools', async (req, res) => {
             const query = {};
             const cursor = toolsCollection.find(query);
@@ -30,6 +32,16 @@ async function run() {
 
             res.send(tools);
         });
+
+        // view tools by id
+        app.get('/purchase/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log(id);
+            const query = { _id: ObjectId(id) };
+            const tool = await toolsCollection.findOne(query);
+            res.send(tool);
+
+        })
 
 
     }
