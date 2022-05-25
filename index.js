@@ -23,6 +23,7 @@ async function run() {
         await client.connect();
         const toolsCollection = client.db('bd-tools').collection('tools');
         const orderCollection = client.db('bd-tools').collection('orders');
+        const userCollection = client.db('bd-tools').collection('users');
 
         // view all tools
 
@@ -49,6 +50,30 @@ async function run() {
         app.post('/purchasing', async (req, res) => {
             const purchasing = req.body;
             const result = await orderCollection.insertOne(purchasing);
+            res.send(result);
+        })
+
+        //view orders of an user
+
+        app.get('/myorders', async (req, res) => {
+            const userEmail = req.query.userEmail;
+            console.log(userEmail);
+            const query = { clientEmail: userEmail };
+            const orders = await orderCollection.find(query).toArray();
+            res.send(orders);
+        })
+
+        //store user info
+
+        app.put('/user/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = req.body;
+            const filter = { email: email };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: user,
+            };
+            const result = await userCollection.updateOne(filter, updateDoc, options)
             res.send(result);
         })
 
