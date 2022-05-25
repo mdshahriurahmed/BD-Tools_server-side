@@ -22,6 +22,7 @@ async function run() {
     try {
         await client.connect();
         const toolsCollection = client.db('bd-tools').collection('tools');
+        const orderCollection = client.db('bd-tools').collection('orders');
 
         // view all tools
 
@@ -36,11 +37,19 @@ async function run() {
         // view tools by id
         app.get('/purchase/:id', async (req, res) => {
             const id = req.params.id;
-            console.log(id);
             const query = { _id: ObjectId(id) };
             const tool = await toolsCollection.findOne(query);
             res.send(tool);
 
+        })
+
+
+        //store order information
+
+        app.post('/purchasing', async (req, res) => {
+            const purchasing = req.body;
+            const result = await orderCollection.insertOne(purchasing);
+            res.send(result);
         })
 
 
