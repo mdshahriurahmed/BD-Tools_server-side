@@ -39,6 +39,7 @@ async function run() {
         const toolsCollection = client.db('bd-tools').collection('tools');
         const orderCollection = client.db('bd-tools').collection('orders');
         const userCollection = client.db('bd-tools').collection('users');
+        const ratingCollection = client.db('bd-tools').collection('rating');
 
         // view all tools
 
@@ -65,6 +66,12 @@ async function run() {
         app.post('/purchasing', async (req, res) => {
             const purchasing = req.body;
             const result = await orderCollection.insertOne(purchasing);
+            res.send(result);
+        })
+        app.post('/rating', async (req, res) => {
+            const rating = req.body;
+            console.log(rating);
+            const result = await ratingCollection.insertOne(rating);
             res.send(result);
         })
 
@@ -121,6 +128,18 @@ async function run() {
             };
 
             const result = await toolsCollection.updateOne(filter, updateDoc, options)
+            res.send(result);
+        })
+        app.put('/updatepayment/:id', async (req, res) => {
+            const id = req.params.id;
+            const tool = req.body;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: tool,
+            };
+
+            const result = await orderCollection.updateOne(filter, updateDoc, options)
             res.send(result);
         })
 
