@@ -77,6 +77,14 @@ async function run() {
             res.send(orders);
         })
 
+        //delete order
+        app.delete('/myorder/:id', verifyJWT, async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await orderCollection.deleteOne(filter);
+            res.send(result);
+        })
+
         //store user info
 
         app.put('/user/:email', async (req, res) => {
