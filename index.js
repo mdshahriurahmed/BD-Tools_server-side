@@ -50,6 +50,13 @@ async function run() {
 
             res.send(tools);
         });
+        app.get('/reviews', async (req, res) => {
+            const query = {};
+            const cursor = ratingCollection.find(query);
+            const ratings = await cursor.toArray();
+
+            res.send(ratings);
+        });
 
         // view tools by id
         app.get('/purchase/:id', verifyJWT, async (req, res) => {
@@ -85,12 +92,29 @@ async function run() {
             res.send(orders);
         })
 
+
+        app.get('/myprofile', verifyJWT, async (req, res) => {
+            const userEmail = req.query.userEmail;
+            const query = { email: userEmail };
+            const profile = await userCollection.findOne(query);
+            res.send(profile);
+        })
+
         //delete order
-        app.delete('/myorder/:id', verifyJWT, async (req, res) => {
-            const id = req.params.id;
-            const filter = { _id: ObjectId(id) };
+        app.delete('/myorder/:_id', verifyJWT, async (req, res) => {
+            const _id = req.params._id;
+            console.log(_id);
+            const filter = { _id: ObjectId(_id) };
             const result = await orderCollection.deleteOne(filter);
             res.send(result);
+        })
+
+        app.get('/myorder2/:id', verifyJWT, async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const tool = await orderCollection.findOne(query);
+            res.send(tool);
+
         })
 
         app.get('/myorders/:id', async (req, res) => {
