@@ -85,6 +85,14 @@ async function run() {
             res.send(result);
         })
 
+        app.get('/myorders/:id', async (req, res) => {
+            const id = req.params.id;
+
+            const filter = { _id: ObjectId(id) };
+            const result = await orderCollection.findOne(filter);
+            res.send(result);
+        })
+
         //store user info
 
         app.put('/user/:email', async (req, res) => {
@@ -95,12 +103,27 @@ async function run() {
             const updateDoc = {
                 $set: user,
             };
-
             const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
 
             const result = await userCollection.updateOne(filter, updateDoc, options)
             res.send({ result, token });
         })
+
+        //update quantity
+        app.put('/newtool/:id', async (req, res) => {
+            const id = req.params.id;
+            const tool = req.body;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: tool,
+            };
+
+            const result = await toolsCollection.updateOne(filter, updateDoc, options)
+            res.send(result);
+        })
+
+
 
 
     }
