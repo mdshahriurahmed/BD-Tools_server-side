@@ -50,6 +50,23 @@ async function run() {
 
             res.send(tools);
         });
+
+        //find all orders
+        app.get('/allorders', verifyJWT, async (req, res) => {
+            const query = {};
+            const cursor = orderCollection.find(query);
+            const orders = await cursor.toArray();
+
+            res.send(orders);
+        });
+
+        //add new tools
+        app.post('/latesttool', async (req, res) => {
+            const tool = req.body;
+            const result = await toolsCollection.insertOne(tool);
+            res.send(result);
+        })
+
         app.get('/reviews', async (req, res) => {
             const query = {};
             const cursor = ratingCollection.find(query);
@@ -101,7 +118,7 @@ async function run() {
         })
 
         //delete order
-        app.delete('/myorder/:_id', verifyJWT, async (req, res) => {
+        app.delete('/myorder/:_id', async (req, res) => {
             const _id = req.params._id;
             console.log(_id);
             const filter = { _id: ObjectId(_id) };
@@ -141,16 +158,31 @@ async function run() {
             res.send({ result, token });
         })
 
-        app.put('/user/admin/:email', async (req, res) => {
+
+        app.get('/admin/:email', async (req, res) => {
             const email = req.params.email;
+            const user = await userCollection.findOne({ email: email });
+            const isAdmin = user.role === 'admin';
+            res.send({ admin: isAdmin });
+        })
 
-            const filter = { email: email };
+        app.put('/user/admin/:email', verifyJWT, async (req, res) => {
+            const email = req.params.email;
+            const requester = req.decoded.email;
+            const requestAccount = await userCollection.findOne({ email: requester });
+            if (requestAccount.role === 'admin') {
+                const filter = { email: email };
 
-            const updateDoc = {
-                $set: { role: 'admin' },
-            };
-            const result = await userCollection.updateOne(filter, updateDoc)
-            res.send(result);
+                const updateDoc = {
+                    $set: { role: 'admin' },
+                };
+                const result = await userCollection.updateOne(filter, updateDoc)
+                res.send(result);
+            }
+            else {
+                res.status(403).send({ message: 'forbidded' })
+            }
+
         })
 
         //update quantity
