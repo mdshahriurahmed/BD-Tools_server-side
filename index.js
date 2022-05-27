@@ -141,6 +141,18 @@ async function run() {
             res.send({ result, token });
         })
 
+        app.put('/user/admin/:email', async (req, res) => {
+            const email = req.params.email;
+
+            const filter = { email: email };
+
+            const updateDoc = {
+                $set: { role: 'admin' },
+            };
+            const result = await userCollection.updateOne(filter, updateDoc)
+            res.send(result);
+        })
+
         //update quantity
         app.put('/newtool/:id', async (req, res) => {
             const id = req.params.id;
@@ -179,6 +191,11 @@ async function run() {
             });
             res.send({ clientSecret: paymentIntent.client_secret })
         });
+
+        app.get('/allusers', verifyJWT, async (req, res) => {
+            const users = await userCollection.find().toArray();
+            res.send(users);
+        })
 
 
     }
