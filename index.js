@@ -126,6 +126,15 @@ async function run() {
             res.send(result);
         })
 
+        //delete product
+        app.delete('/mytools/:_id', async (req, res) => {
+            const _id = req.params._id;
+            console.log(_id);
+            const filter = { _id: ObjectId(_id) };
+            const result = await toolsCollection.deleteOne(filter);
+            res.send(result);
+        })
+
         app.get('/myorder2/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
