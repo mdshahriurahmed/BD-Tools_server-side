@@ -94,7 +94,6 @@ async function run() {
         })
         app.post('/rating', async (req, res) => {
             const rating = req.body;
-            console.log(rating);
             const result = await ratingCollection.insertOne(rating);
             res.send(result);
         })
